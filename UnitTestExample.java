@@ -1,12 +1,14 @@
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 
 public class UnitTestExample {
 
-	private Integer n; // not used, just showing a style issue
+	private Integer count; // not used, just showing a style issue
 	private String planet = "Earth";
-	private String satellite = "moon";
+	private String satellite = "Moon";
 
 	@Test
 	public void test1() {
@@ -27,23 +29,26 @@ public class UnitTestExample {
 	public void test3() {
 		String outputCollected = "";
 
-		String command = "java -jar checkstyle-9.2.1-all.jar -c ./CS1111_checks.xml UnitTestExample.java";
+		String command = "java -Dfile.encoding=UTF-8 -Duser.language=en -Duser.country=US " 
+                 + "-jar checkstyle-9.2.1-all.jar -c ./CS1111_checks.xml UnitTestExample.java";
+
 		try {
 			Process process = Runtime.getRuntime().exec(command);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
 			String line;
 			while ((line = reader.readLine()) != null) 
 				outputCollected += line;
 			reader.close();
 
-			reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			reader = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8));
 			while ((line = reader.readLine()) != null) 
 				outputCollected += line;
 			reader.close();
-		} catch (IOException exc) {
+			process.waitFor();
+		} catch (IOException | InterruptedException exc) {
 			exc.printStackTrace();
 		}
-
+		
 		System.out.println(outputCollected);
 
 		String expectedName = "Starting audit...Audit done.";
